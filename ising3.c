@@ -5,7 +5,7 @@
 #include <math.h>
 
 #define min(a,b) (((a) < (b) ? (a) : (b)))
-
+// 신기하다 ㅋㅋ
 void change(float*, int);
 float energy(float*, int);
 float magnetization(float*, int);
