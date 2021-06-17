@@ -2,18 +2,21 @@
 
 float variance (float *array, int iteration){
         float v;
-        float mean_of_square, square_of_mean;
+        float mean_of_square = 0, square_of_mean = 0;
         int i = 0;
         
         for(i=0; i<iteration; i++){
-                square_of_mean = array[i];
-                mean_of_square = array[i]*array[i];
+                square_of_mean = square_of_mean + array[i];
+                mean_of_square = mean_of_square + array[i]*array[i];
         }
 
         square_of_mean = square_of_mean/(iteration);
         square_of_mean = square_of_mean*square_of_mean;
 
         mean_of_square = mean_of_square/(iteration);
+
+	printf("mean_of_square is %f", mean_of_square);
+	printf("square_of_mean is %f", square_of_mean);
 
         v = mean_of_square - square_of_mean;
 
@@ -30,7 +33,7 @@ int main(){
 
 	var = variance(spin, 3);
 
-	printf("%f", var);
+	printf("%f\n", var);
 
 	return 0;
 }

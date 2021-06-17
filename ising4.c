@@ -13,7 +13,7 @@ float variance(float*, int, int);
 
 int main(){
 	srand((unsigned int)time(NULL));
-	int size = 0, iteration = 0, i = 0, j = 0, k = 0, temperature;
+	int size = 0, iteration = 0, i = 0, j = 0, k = 0, temperature = 10, temp_seg_num = 1000;
 	float standard, probability, energy1, energy2;
 	const int relaxation = 20;
 
@@ -22,31 +22,27 @@ int main(){
 	printf("System size is ");
 	scanf("%d", &size);
 
-	printf("Number of iteration is (need to greater than 20)");
+	printf("Number of iteration is (need to greater than 20) ");
 	scanf(" %d", &iteration);
-
-	printf("Maximum temperature is ");
-	scanf(" %d", &temperature);
 	
 	float *spin = malloc(sizeof(float)*size);
 	float *tmp = malloc(sizeof(float)*size);
 	float *Eplot = malloc(sizeof(float)*(iteration+1));
 	float *Mplot = malloc(sizeof(float)*(iteration+1));
-	float *Temp = malloc(sizeof(float)*temperature);
-	float *Mean_energy = malloc(sizeof(float)*temperature);
-	float *Mean_magnetization = malloc(sizeof(float)*temperature);
-	float *Var_energy = malloc(sizeof(float)*temperature);
-	float *Var_magnetization = malloc(sizeof(float)*temperature);
+	float *Temp = malloc(sizeof(float)*temp_seg_num);
+	float *Mean_energy = malloc(sizeof(float)*temp_seg_num);
+	float *Mean_magnetization = malloc(sizeof(float)*temp_seg_num);
+	float *Var_energy = malloc(sizeof(float)*temp_seg_num);
+	float *Var_magnetization = malloc(sizeof(float)*temp_seg_num);
 	float *Eplot_T0 = malloc(sizeof(float)*(iteration+1));
 	float *Mplot_T0 = malloc(sizeof(float)*(iteration+1));
 
-	for(i=0; i<temperature; i++){
-		Temp[i] = i;
+	for(i=0; i<temp_seg_num; i++){
+		Temp[i] = (i+1)/(temp_seg_num/(float)temperature);
+		printf("%f\n", Temp[i]);
 	}
-
-	Temp[0] = 0.01;
 	
-	for(i=0; i<temperature; i++){
+	for(i=0; i<temp_seg_num; i++){
 		//About ith temperature
 		for(j=0; j<size; j++){
 			//Initialize system
@@ -89,12 +85,6 @@ int main(){
 			Mplot[j+1] = magnetization(spin, size);
 		}
 		
-		if(i==0){
-			memmove(Eplot_T0, Eplot, sizeof(float)*(iteration+1));
-			memmove(Mplot_T0, Mplot, sizeof(float)*(iteration+1));
-		}
-		
-		
 		for(j=relaxation; j<iteration; j++){
 			Mean_energy[i] = Mean_energy[i] + Eplot[j];
 			Mean_magnetization[i] = Mean_magnetization[i] + Mplot[j];
@@ -109,53 +99,38 @@ int main(){
 
 	fp = fopen("Mean_energy.txt", "wt");
 
-	for(i=0; i<temperature; i++){
-		fprintf(fp, "%d %f\n", i, Mean_energy[i]);
+	for(i=0; i<temp_seg_num; i++){
+		fprintf(fp, "%f %f\n", Temp[i], Mean_energy[i]);
         }
 	
 	fclose(fp);
 
 	fp = fopen("Mean_magnetization.txt", "wt");
 
-	for(i=0; i<temperature; i++){
-		fprintf(fp, "%d %f\n", i, Mean_magnetization[i]);
+	for(i=0; i<temp_seg_num; i++){
+		fprintf(fp, "%f %f\n", Temp[i], Mean_magnetization[i]);
         }
 	
 	fclose(fp);
 
 	fp = fopen("Var_energy.txt", "wt");
 
-	for(i=0; i<temperature; i++){
-		fprintf(fp, "%d %f\n", i, Var_energy[i]);
+	for(i=0; i<temp_seg_num; i++){
+		fprintf(fp, "%f %f\n", Temp[i], Var_energy[i]);
         }
 	
 	fclose(fp);
 
 	fp = fopen("Var_magnetization.txt", "wt");
 
-	for(i=0; i<temperature; i++){
-		fprintf(fp, "%d %f\n", i, Var_magnetization[i]);
+	for(i=0; i<temp_seg_num; i++){
+		fprintf(fp, "%f %f\n", Temp[i], Var_magnetization[i]);
         }
 	
 	fclose(fp);
 
-	fp = fopen("Time_energy.txt", "wt");
-
-	for(i=0; i<iteration; i++){
-		fprintf(fp, "%d %f\n", i, Eplot_T0[i]);
-        }
+	printf("Complete!\n");
 	
-	fclose(fp);
-
-	fp = fopen("Time_magnetization.txt", "wt");
-
-	for(i=0; i<iteration; i++){
-		fprintf(fp, "%d %f\n", i, Mplot_T0[i]);
-        }
-	
-	fclose(fp);
-
-
 	return 0;
 }
 
