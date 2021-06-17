@@ -5,10 +5,11 @@
 #include <math.h>
 
 #define min(a,b) (((a) < (b) ? (a) : (b)))
-// 신기하다 ㅋㅋ
+
 void change(float*, int);
 float energy(float*, int);
 float magnetization(float*, int);
+float variance(float*, int);
 
 int main(){
 	srand((unsigned int)time(NULL));
@@ -17,15 +18,13 @@ int main(){
 
 	FILE *fp;
 
-	fp = fopen("result.txt", "wt");
-
 	printf("System size is ");
 	scanf("%d", &size);
 
 	printf("Number of iteration is ");
 	scanf(" %d", &iteration);
 
-	printf("Temperature is");
+	printf("Maximum temperature is ");
 	scanf(" %d", &temperature);
 	
 	float *spin = malloc(sizeof(float)*size);
@@ -34,13 +33,16 @@ int main(){
 	float *Mplot = malloc(sizeof(float)*(iteration+1));
 	float *Temp = malloc(sizeof(float)*temperature);
 	float *Mean_energy = malloc(sizeof(float)*temperature);
+	float *Mean_magnetization = malloc(sizeof(float)*temperature);
 
 	for(i=0; i<temperature; i++){
 		Temp[i] = i;
 	}
 	
 	for(i=0; i<temperature; i++){
+		//About ith temperature
 		for(j=0; j<size; j++){
+			//Initialize system
 			standard = rand()/(float)RAND_MAX;
 			if(standard>0.5){
 				spin[j] = 1;
@@ -58,11 +60,13 @@ int main(){
 				memmove(tmp, spin, sizeof(float)*size);
 				change(spin, size);
 				
+				//Compare energy
 				energy1 = energy(tmp, size);
 				energy2 = energy(spin, size);
-		
+				
 				probability = min(1, exp(-(energy2-energy1)/Temp[i]));
 				
+				//Decision
 				if((rand()/(float)RAND_MAX)>probability){
 					memmove(spin, tmp, sizeof(float)*size);
 				}	
@@ -74,15 +78,29 @@ int main(){
 		
 		for(j=20; j<iteration; j++){
 			Mean_energy[i] = Mean_energy[i] + Eplot[j];
+			Mean_magnetization[i] = Mean_magnetization[i] + Mplot[j];
 		}
+
 		Mean_energy[i] = Mean_energy[i]/(iteration-20);
+		Mean_magnetization[i] = Mean_magnetization[i]/(iteration-20);
 	}	
+
+	fp = fopen("Mean_energy.txt", "wt");
 
 	for(i=0; i<temperature; i++){
 		fprintf(fp, "%d %f\n", i, Mean_energy[i]);
         }
 	
 	fclose(fp);
+
+	fp = fopen("Mean_magnetization.txt", "wt");
+
+	for(i=0; i<temperature; i++){
+		fprintf(fp, "%d %f\n", i, Mean_magnetization[i]);
+        }
+	
+	fclose(fp);
+
 
 	return 0;
 }
@@ -117,4 +135,10 @@ float magnetization(float *spin, int size){
 	m = m/size;
 
 	return m;
+}
+
+float variance (float *array, int size){
+	float v;
+
+	return v;
 }
